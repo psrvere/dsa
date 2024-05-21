@@ -126,45 +126,86 @@ func twoSum2(i int, nums []int, ans *[][]int) {
 	}
 }
 
-// func Test_threeSum(t *testing.T) {
-// 	tc := struct {
-// 		i []int
-// 		o [][]int
-// 	}{
-// 		i: []int{-1, 0, 1, 2, -1, -4},
-// 		o: [][]int{{-1, -1, 2}, {-1, 0, 1}},
-// 	}
+// Solution 3
+// Using Hashset in two sum function
 
-// 	ans := threeSum2(tc.i)
-// 	assert.Equal(t, true, reflect.DeepEqual(ans, tc.o))
-// }
+func Test_threeSum3(t *testing.T) {
+	tc := struct {
+		i []int
+		o [][]int
+	}{
+		i: []int{-2, 0, 1, 1, 2},
+		o: [][]int{{-2, 0, 2}, {-2, 1, 1}},
+	}
+	// tc := struct {
+	// 	i []int
+	// 	o [][]int
+	// }{
+	// 	i: []int{-1, 0, 1, 2, -1, -4},
+	// 	// o: [][]int{{-1, -1, 2}, {-1, 0, 1}},
+	// 	o: [][]int{{-1, 0, 1}, {-1, 2, -1}},
+	// }
 
-// func threeSum2(nums []int) [][]int {
+	ans := threeSum3(tc.i)
+	// fmt.Println("ans: ", ans)
+	// fmt.Println("tc.0: ", tc.o)
+	// fmt.Println(reflect.DeepEqual(ans, tc.o))
+
+	// a := [3]int{1, 2, 3}
+	// b := [3]int{3, 2, 1}
+	// fmt.Println(a == b)
+
+	// assert.ElementsMatch(t, tc.o, ans)
+
+	assert.Equal(t, true, reflect.DeepEqual(ans, tc.o))
+}
+
+func threeSum3(nums []int) [][]int {
+	sort.Ints(nums)
+	ans := [][]int{}
+	for i := 0; i < len(nums) && nums[i] <= 0; i++ {
+		if i == 0 || nums[i-1] != nums[i] { // beautiful condition
+			twoSum3(i, nums, &ans)
+		}
+	}
+	return ans
+}
+
+func twoSum3(i int, nums []int, ans *[][]int) {
+	hash := make(map[int]bool)
+	for j := i + 1; j < len(nums); j++ {
+		complement := -nums[i] - nums[j]
+		if hash[complement] {
+			*ans = append(*ans, []int{nums[i], nums[j], complement})
+			for j+1 < len(nums) && nums[j] == nums[j+1] { // beautiful condition
+				j++
+			}
+		}
+		hash[nums[j]] = true
+	}
+}
+
+// func threeSum3(nums []int) [][]int {
 // 	sort.Ints(nums)
 // 	res := [][]int{}
 // 	for i := 0; i < len(nums) && nums[i] <= 0; i++ {
 // 		if i == 0 || nums[i-1] != nums[i] {
-// 			twoSumII(nums, i, &res)
+// 			twoSum3(nums, i, &res)
 // 		}
 // 	}
 // 	return res
 // }
 
-// func twoSumII(nums []int, i int, res *[][]int) {
-// 	lo, hi := i+1, len(nums)-1
-// 	for lo < hi {
-// 		sum := nums[i] + nums[lo] + nums[hi]
-// 		if sum < 0 {
-// 			lo++
-// 		} else if sum > 0 {
-// 			hi--
-// 		} else {
-// 			*res = append(*res, []int{nums[i], nums[lo], nums[hi]})
-// 			lo++
-// 			hi--
-// 			for lo < hi && nums[lo] == nums[lo-1] {
-// 				lo++
+// func twoSum3(nums []int, i int, res *[][]int) {
+// 	seen := map[int]bool{}
+// 	for j := i + 1; j < len(nums); j++ {
+// 		complement := -nums[i] - nums[j]
+// 		if seen[complement] {
+// 			*res = append(*res, []int{nums[i], nums[j], complement})
+// 			for j+1 < len(nums) && nums[j] == nums[j+1] {
+// 				j++
 // 			}
 // 		}
+// 		seen[nums[j]] = true
 // 	}
 // }

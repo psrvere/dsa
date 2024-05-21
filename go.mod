@@ -1,4 +1,4 @@
-module two_pointers
+module dsa
 
 go 1.22.3
 

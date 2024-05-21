@@ -1,4 +1,4 @@
-package array_questions
+package arrays
 
 // question - what should be the delimiter
 
