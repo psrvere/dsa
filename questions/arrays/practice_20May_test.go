@@ -75,3 +75,21 @@ func containsNearbyDuplicate2_20May(nums []int, k int) bool {
 }
 
 // 242 Valid Anagram
+// Approach 1 - use hm to count charaters, increase for s and decrease for t
+
+func isAnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+	hm := map[byte]int{}
+	for i := range s {
+		hm[s[i]] = hm[s[i]] + 1
+		hm[t[i]] = hm[t[i]] - 1
+	}
+	for _, val := range hm {
+		if val != 0 {
+			return false
+		}
+	}
+	return true
+}
