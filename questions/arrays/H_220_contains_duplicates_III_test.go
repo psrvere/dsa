@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"math"
 )
+
+// https://leetcode.com/problems/contains-duplicate-iii/editorial/
 
 // Solution 1 - brute force - two loops - time limit exceeded
 func Test_containsNearbyAlmostDuplicate(t *testing.T) {
@@ -63,7 +63,7 @@ func Test_containsNearbyAlmostDuplicate2(t *testing.T) {
 			nums      []int
 			indexDiff int
 			valueDiff int
-		}{nums: []int{-3, 3, -6}, indexDiff: 2, valueDiff: 3},
+		}{nums: []int{-3, 3}, indexDiff: 2, valueDiff: 4},
 		o: false,
 	}
 
@@ -82,8 +82,16 @@ func containsNearbyAlmostDuplicate2(nums []int, indexDiff int, valueDiff int) bo
 	}
 	bucket := map[int]int{}
 	for i, num := range nums {
+		// handle -ve numbers
+
 		// bucket id
 		id := num / bs
+
+		// offset the id for negative numbers
+		// TC {-3, 3, 6}, 2, 3
+		if num < 0 {
+			id--
+		}
 
 		// check in the same bucket
 		if j, ok := bucket[id]; ok && i-j <= indexDiff {
@@ -91,12 +99,12 @@ func containsNearbyAlmostDuplicate2(nums []int, indexDiff int, valueDiff int) bo
 		}
 
 		// check in the previous bucket
-		if j, ok := bucket[id-1]; ok && i-j <= indexDiff && int(math.Abs(float64(nums[i])-float64(nums[j]))) <= valueDiff {
+		if j, ok := bucket[id-1]; ok && i-j <= indexDiff && abs(nums[i]-nums[j]) <= valueDiff {
 			return true
 		}
 
 		// check in the next bucket
-		if j, ok := bucket[id+1]; ok && i-j <= indexDiff && int(math.Abs(float64(nums[i])-float64(nums[j]))) <= valueDiff {
+		if j, ok := bucket[id+1]; ok && i-j <= indexDiff && abs(nums[i]-nums[j]) <= valueDiff {
 			return true
 		}
 
@@ -105,3 +113,12 @@ func containsNearbyAlmostDuplicate2(nums []int, indexDiff int, valueDiff int) bo
 	}
 	return false
 }
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+// Solution 3 - Using BST
