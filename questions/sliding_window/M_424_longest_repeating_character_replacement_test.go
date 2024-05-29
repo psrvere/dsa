@@ -242,3 +242,28 @@ func characterReplacement3(s string, k int) int {
 }
 
 // Approach 3 - Sliding window - fast
+// TC - O(n)
+// SC - O(m) 0 <= m <= 26
+func characterReplacement4(s string, k int) int {
+	start := 0
+	maxFreq := 0
+	windowSize := 0 // valid window
+	freqMap := map[byte]int{}
+	for end := 0; end < len(s); end++ {
+		freqMap[s[end]]++
+
+		if maxFreq < freqMap[s[end]] {
+			maxFreq = freqMap[s[end]]
+		}
+
+		// check if window is invalid
+		if end-start+1-maxFreq > k {
+			// if invalid, eject the left most character from window
+			freqMap[s[start]]--
+			start++
+		} else {
+			windowSize = end - start + 1
+		}
+	}
+	return windowSize
+}
