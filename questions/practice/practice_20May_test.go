@@ -1,4 +1,4 @@
-package arrays
+package practice
 
 import (
 	"slices"
