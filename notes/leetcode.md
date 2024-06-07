@@ -1,0 +1,1 @@
+- Usually, if an algorithm is O(n^2), it can handle n up to around 10^4. It gets Time Limit Exceeded when n≥10^5.
