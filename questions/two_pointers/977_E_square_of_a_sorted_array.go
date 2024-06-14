@@ -1,4 +1,4 @@
-package binarysearch
+package two_pointers
 
 import "sort"
 
