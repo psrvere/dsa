@@ -25,7 +25,7 @@ func lengthOfLastWord1(s string) int {
 	return len(arr[len(arr)-1])
 }
 
-// Approach 2
+// Approach 2 - iterate from backwards
 func lengthOfLastWord2(s string) int {
 	count := 0
 	found := false
@@ -39,4 +39,24 @@ func lengthOfLastWord2(s string) int {
 		count++
 	}
 	return count
+}
+
+// Approach 3 - trim trailing spaces
+
+// Approach 4a - practice session
+func lengthOfLastWord4a(s string) int {
+	arr := strings.Split(s, " ")
+	for i := len(arr) - 1; i >= 0; i-- {
+		if arr[i] == " " || arr[i] == "" {
+			continue
+		}
+		return len(arr[i])
+	}
+	return 0
+}
+
+// Approach 4b using strings.Fields
+func lengthOfLastWord4b(s string) int {
+	arr := strings.Fields(s)
+	return len(arr[len(arr)-1])
 }
