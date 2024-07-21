@@ -116,3 +116,37 @@ func groupAnagrams2a(strs []string) [][]string {
 
 	return res
 }
+
+// Solution 3
+func groupAnagrams3(strs []string) [][]string {
+	keyWordMap := map[string][]string{}
+	for _, str := range strs {
+		key := getKeyString(str)
+		fmt.Println(key, str)
+		keyWordMap[key] = append(keyWordMap[key], str)
+	}
+
+	var ans [][]string
+	for _, value := range keyWordMap {
+		ans = append(ans, value)
+	}
+
+	return ans
+}
+
+func getKeyString(str string) string {
+	key := "00000000000000000000000000" // the limitation is the maximum we can count is 9 counts of a single character
+	for i := range str {
+		char := str[i] - 'a'
+		count, err := strconv.Atoi(string(key[char]))
+		if err != nil {
+			fmt.Println("error encountered")
+			return ""
+		}
+		count = count + 1
+		fmt.Println("i: ", i)
+		fmt.Println("count: ", count)
+		key = key[:char] + strconv.Itoa(count) + key[char+1:]
+	}
+	return key
+}
