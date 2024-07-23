@@ -3,6 +3,8 @@ package notes
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Video - freecodecamp course - https://youtu.be/oBt53YbR9Kk?si=F2G4-EMaQGogTuJe
@@ -10,8 +12,10 @@ import (
 // Part 1 - memoization
 // Part 2 - tabulation
 
-// Problem 1 - Write a function fib(n) that takes in a number as an argument. The function should return the n-th number of the Fibonacci sequence.
+// **************************************** //
 
+// Problem 1 - Write a function fib(n) that takes in a number as an argument.
+// The function should return the n-th number of the Fibonacci sequence.
 // recursion implementation
 
 func Benchmark_Fibonacci(b *testing.B) {
@@ -153,6 +157,8 @@ func getFibonacciMemo(n int) int {
 // The time complexity after memoization is O(n) for above solution
 // Space complexity is O(n)
 
+// **************************************** //
+
 // Problem 2: Grid Traveller
 // Say that you are a traveller on a 2D grid. You begin in the top left corner and your goal is to
 // travel to the bottom right corner. You may only move down or right.
@@ -232,12 +238,37 @@ func getRoutesGridTraveler(m, n int) int {
 // - add a new base case which captures the memo
 // - store return values in to the memo
 
+// **************************************** //
+
 // Problem 3 - Write a function canSum(targetSum, numbers) that takes in a targetSum and an array of numbers as arguments
 // The function should return a boolean indicating whether or not it is possible to generate the targetSum using numbers
 // from the array
 // Contrainsts
 // 1) you may use an element of the array as many times as needed
 // 2) you may assume that all input numbers are nonnegative
+
+// [NEW] - this is called table driven testing
+// we can use an array of tests to cover multiple testing scenarios in a single test
+func Test_canSum(t *testing.T) {
+	tests := []struct {
+		targetSum int
+		nums      []int
+		want      bool
+	}{
+		{7, []int{2, 3}, true},
+		{7, []int{5, 3, 4, 7}, true},
+		{7, []int{2, 4}, false},
+		{8, []int{2, 3, 5}, true},
+		{300, []int{7, 14}, false},
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("Test-%v", i), func(t *testing.T) {
+			got := canSum(test.targetSum, test.nums)
+			assert.Equal(t, test.want, got)
+		})
+	}
+}
 
 func canSum(targetSum int, numbers []int) bool {
 	if targetSum == 0 {
@@ -259,3 +290,95 @@ func canSum(targetSum int, numbers []int) bool {
 
 	return false
 }
+
+// space and time complexity for above
+// m = targetSum and n = length of arry
+// maximum depth of tree is m in the worst case scenario when we keep deducting 1 on one branch of tree
+// branching factor: on each level worst case scenarios is each node makes n more nodes for each element of array
+// hence total number of nodes = 1 + n + n^2 + n^3 .... till m levels
+// i.e. Time Complexity is O(n^m)
+// and Spacce Complexity is O(m)
+
+// Improving time complexity by memoizing above solutions
+
+type canSumWithMemo struct {
+	memo map[int]bool
+}
+
+func NewCanSumWithMemo() *canSumWithMemo {
+	return &canSumWithMemo{
+		memo: map[int]bool{},
+	}
+}
+
+func (sm *canSumWithMemo) canSum(targetSum int, nums []int) bool {
+	if targetSum == 0 {
+		return true
+	}
+
+	for i := 0; i < len(nums); i++ {
+		newTargetSum := targetSum - nums[i]
+		if newTargetSum < 0 {
+			continue
+		}
+		if val, ok := sm.memo[newTargetSum]; ok {
+			return val
+		}
+		isPossible := sm.canSum(newTargetSum, nums)
+		if isPossible {
+			sm.memo[newTargetSum] = true
+			return true
+		} else {
+			sm.memo[newTargetSum] = false
+		}
+	}
+	return false
+}
+
+func canSumWithMemoFunc(targetSum int, nums []int) bool {
+	sm := NewCanSumWithMemo()
+	return sm.canSum(targetSum, nums)
+}
+
+func Test_canSumWithMemoFunc(t *testing.T) {
+	tests := []struct {
+		targetSum int
+		nums      []int
+		want      bool
+	}{
+		{7, []int{2, 3}, true},
+		{7, []int{5, 3, 4, 7}, true},
+		{7, []int{2, 4}, false},
+		{8, []int{2, 3, 5}, true},
+		{300, []int{7, 14}, false},
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("Test-%v", i), func(t *testing.T) {
+			got := canSumWithMemoFunc(test.targetSum, test.nums)
+			assert.Equal(t, test.want, got)
+		})
+	}
+}
+
+// [NEW]
+// Run only a particular test
+// go test ./notes -run Test_canSumWithMemoFunc
+
+// Reset testing cache of Golang
+// go clean -testcache
+
+// Run test without caching
+// go test ./notes -run Test_canSumWithMemoFunc -count=1
+
+// So what is the improved time complexity after memoization?
+// Time Complexity O(m * n). We have m levels and at each level there can be a maximum of n nodes for that value
+// Space Complexity remains same at O(m)
+
+// **************************************** //
+
+// Problem 4 - howSum
+// Write a function 'howSum(targetSum, nums)' that takes in a targetSum and an array of numbers as arguments
+// The function should return an array contining any combination of elements that add up to exactly
+// The targetSum. If there is not combination that adds up to the targetSum, then return null
+// If there are multiple combinations possible, you may return any single one
