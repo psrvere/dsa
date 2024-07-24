@@ -292,7 +292,7 @@ func canSum(targetSum int, numbers []int) bool {
 }
 
 // space and time complexity for above
-// m = targetSum and n = length of arry
+// m = targetSum and n = length of array
 // maximum depth of tree is m in the worst case scenario when we keep deducting 1 on one branch of tree
 // branching factor: on each level worst case scenarios is each node makes n more nodes for each element of array
 // hence total number of nodes = 1 + n + n^2 + n^3 .... till m levels
@@ -380,5 +380,131 @@ func Test_canSumWithMemoFunc(t *testing.T) {
 // Problem 4 - howSum
 // Write a function 'howSum(targetSum, nums)' that takes in a targetSum and an array of numbers as arguments
 // The function should return an array contining any combination of elements that add up to exactly
-// The targetSum. If there is not combination that adds up to the targetSum, then return null
+// The targetSum. If there is no combination that adds up to the targetSum, then return null
 // If there are multiple combinations possible, you may return any single one
+
+func Test_howSum(t *testing.T) {
+	tests := []struct {
+		targetSum int
+		nums      []int
+		want      []int
+	}{
+		{7, []int{2, 3}, []int{3, 2, 2}},
+		{7, []int{5, 3, 4, 7}, []int{4, 3}},
+		{7, []int{2, 4}, nil},
+		{8, []int{2, 3, 5}, []int{2, 2, 2, 2}},
+		{300, []int{7, 14}, nil},
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("Test-%v", i), func(t *testing.T) {
+			got := howSum(test.targetSum, test.nums)
+			assert.Equal(t, test.want, got)
+		})
+	}
+}
+
+func howSum(target int, nums []int) []int {
+	// base case
+	if target == 0 {
+		return []int{}
+	}
+	if target < 0 {
+		return nil
+	}
+	for _, num := range nums {
+		newTarget := target - num
+		ret := howSum(newTarget, nums)
+		if ret != nil {
+			return append(ret, num)
+		}
+	}
+	return nil
+}
+
+// Time complexity
+// m = target sum, n = length of array
+// Recursive tree depth = m
+// branching factor = n
+// Time Complexity - O(n^m) - these are total recursive calls made
+// Space Complexity - O(m) - these are total max recursive calls at a given point
+
+// [NEW]
+// In above code append statement time complexity in the worst case
+// can be O(n) where the slice size is doubles and all elements are
+// compied. the maximum number of elements to be appended in an array
+// can be target value itself (i.e. 1 element m times)
+// this makes overall time complexity as O(n^m * m)
+
+// Memoizing the solution for better time complexity
+
+type howSumWithMemo struct {
+	memo map[int][]int
+}
+
+func NewHowSumWithMemo() *howSumWithMemo {
+	return &howSumWithMemo{
+		memo: make(map[int][]int),
+	}
+}
+
+func (sm *howSumWithMemo) howSum(target int, nums []int) []int {
+	// base case
+	if target == 0 {
+		return []int{}
+	}
+	if target < 0 {
+		return nil
+	}
+	for _, num := range nums {
+		newTarget := target - num
+
+		var ret []int
+		if val, ok := sm.memo[newTarget]; ok {
+			ret = val
+		} else {
+			ret = sm.howSum(newTarget, nums)
+			sm.memo[newTarget] = ret
+		}
+
+		if ret != nil {
+			return append(ret, num)
+		}
+	}
+	return nil
+}
+
+func calculateHowSum(target int, nums []int) []int {
+	sumWithMemo := NewHowSumWithMemo()
+	return sumWithMemo.howSum(target, nums)
+}
+
+func Test_calculateHowSum(t *testing.T) {
+	tests := []struct {
+		targetSum int
+		nums      []int
+		want      []int
+	}{
+		{7, []int{2, 3}, []int{3, 2, 2}},
+		{7, []int{5, 3, 4, 7}, []int{4, 3}},
+		{7, []int{2, 4}, nil},
+		{8, []int{2, 3, 5}, []int{2, 2, 2, 2}},
+		{300, []int{7, 14}, nil},
+	}
+
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("Test-%v", i), func(t *testing.T) {
+			got := calculateHowSum(test.targetSum, test.nums)
+			assert.Equal(t, test.want, got)
+		})
+	}
+}
+
+// Memoized Soulution Time Complexity
+// m = target sum, n = length of array
+// Recursive tree depth = m
+// TBD
+// space complexity
+// stack depth: O(m)
+// memo object space complexity: O(m * m) - m max possible keys with m length array as value
+// i.r. Space Complexity: O(m^2)
